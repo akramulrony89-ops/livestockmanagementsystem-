@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Livestock Production Management System</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Inter font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Use Inter as the default font */
+        body {
+            font-family: 'Inter', sans-serif;
+            /* New colorful background gradient */
+            background: linear-gradient(135deg, #e0f7fa 0%, #f0fdf4 100%);
+            min-height: 100vh;
+        }
+        /* Custom styles for active tab */
+        .tab-btn.active {
+            border-color: #2563eb; /* Blue-600 */
+            background-color: #2563eb;
+            color: white;
+        }
+
+        /* Updated input/select focus styles */
+        input[type="date"], 
+        input[type="number"], 
+        select {
+            transition: all 0.2s ease-in-out;
+        }
+        input[type="date"]:focus, 
+        input[type="number"]:focus, 
+        select:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); /* Tailwind blue-500/30 */
+            border-color: #2563eb; /* Tailwind blue-600 */
+        }
+
+        /* Hover effect for output tables */
+        .output-table tbody tr:hover {
+            background-color: #f9fafb; /* gray-50 */
+        }
+        
+        /* Hover effect for vax list */
+        .vax-list-item:hover {
+            background-color: #f9fafb; /* gray-50 */
+            transform: translateX(4px);
+        }
+
+        /* Simple animation for modal */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .modal {
+            animation: fadeIn 0.2s ease-out;
+        }
+        
+        /* Animation for the form card loading */
+        @keyframes popIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .form-card {
+            animation: popIn 0.5s ease-out;
+        }
+        
+        /* Animation for the output section appearing */
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .output-section-animated {
+            animation: slideInUp 0.6s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-emerald-600 to-green-700 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-5 flex flex-col md:flex-row justify-between md:items-center">
+            
+            <!-- Title and Icon -->
+            <div class="flex items-center justify-center md:justify-start">
+                <!-- Beaker Icon -->
+                <svg class="w-10 h-10 md:w-12 md:h-12 mr-3 shrink-0 text-white opacity-80" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19 14.5M14.25 3.104c.251.023.501.05.75.082m-.75-.082c-.319 0-.638-.008-.958-.022M19 14.5v.212c0 1.29-.592 2.522-1.61 3.288l-4.39 3.041a1.125 1.125 0 01-1.414 0l-4.39-3.041A3.75 3.75 0 015 14.712V14.5m14 0h-14" />
+                </svg>
+                <div class="text-center md:text-left">
+                    <h1 class="text-2xl md:text-3xl font-bold tracking-tight">Livestock Management System</h1>
+                    <p class="text-sm text-green-100">Optimized for Bangladeshi Conditions</p>
+                </div>
+            </div>
+            
+            <!-- Developer Info -->
+            <div class="text-center md:text-right mt-4 md:mt-0 bg-black bg-opacity-30 px-4 py-2 rounded-lg">
+                <p class="font-semibold text-lg">MD AKRAMUL HAQUE</p>
+                <p class="text-sm text-gray-200">BCS (LIVESTOCK)</p>
+                <p class="text-sm text-gray-200">Mob: 01701057143</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-4 md:p-8">
+        
+        <!-- Input Form Card -->
+        <div class="form-card bg-white p-6 md:p-8 rounded-2xl shadow-xl border border-gray-200">
+            <form id="management-form">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- Column 1 -->
+                    <div>
+                        <label for="livestock-type" class="block text-sm font-medium text-gray-700 mb-1">1. Livestock Type</label>
+                        <select id="livestock-type" name="livestock-type" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base py-3 px-4 bg-gray-50" required>
+                            <option value="">Select Type</option>
+                            <option value="Cattle">Cattle (গরু)</option>
+                            <option value="Buffalo">Buffalo (মহিষ)</option>
+                            <option value="Goat">Goat (ছাগল)</option>
+                            <option value="Sheep">Sheep (ভেড়া)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="arrival-date" class="block text-sm font-medium text-gray-700 mb-1">2. Date of Arrival (আগমনের তারিখ)</label>
+                        <input type="date" id="arrival-date" name="arrival-date" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base py-3 px-4 bg-gray-50" required>
+                    </div>
+
+                    <div>
+                        <label for="initial-weight" class="block text-sm font-medium text-gray-700 mb-1">3. Initial Body Weight (kg)</label>
+                        <input type="number" id="initial-weight" name="initial-weight" placeholder="e.g., 150" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base py-3 px-4 bg-gray-50" required>
+                    </div>
+
+                    <div>
+                        <label for="purpose" class="block text-sm font-medium text-gray-700 mb-1">4. Purpose of Production (উদ্দেশ্য)</label>
+                        <select id="purpose" name="purpose" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base py-3 px-4 bg-gray-50" required>
+                            <option value="">Select Purpose</option>
+                            <option value="Fattening">Fattening (মোটা তাজা করণ)</option>
+                            <option value="Milk Production">Milk Production (দুধ উৎপাদন)</option>
+                            <option value="Breeding">Breeding (প্রজনন)</option>
+                        </select>
+                    </div>
+
+                    <!-- Conditional Fields -->
+                    <div id="fattening-fields" class="hidden">
+                        <label for="adg" class="block text-sm font-medium text-gray-700 mb-1">Target ADG (gm/day)</label>
+                        <input type="number" id="adg" name="adg" placeholder="e.g., 700" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base py-3 px-4 bg-gray-50">
+                    </div>
+
+                    <div id="milk-fields" class="hidden">
+                        <label for="milk-yield" class="block text-sm font-medium text-gray-700 mb-1">Daily Milk Yield (Liters)</label>
+                        <input type="number" id="milk-yield" name="milk-yield" placeholder="e.g., 10" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base py-3 px-4 bg-gray-50">
+                    </div>
+                </div>
+
+                <!-- Generate Button -->
+                <div class="mt-8 text-center">
+                    <button type="submit" class="w-full md:w-1/2 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold text-lg py-4 px-6 rounded-lg shadow-lg shadow-green-500/30 hover:from-green-600 hover:to-emerald-700 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105">
+                        Generate Management Plan
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Output Section -->
+        <div id="output-section" class="hidden mt-10 bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+            <div class="p-5 md:p-8">
+                <h2 class="text-2xl md:text-3xl font-bold text-center text-blue-800 mb-6">
+                    Generated Management Plan for <span id="animal-type-heading" class="text-green-600"></span>
+                </h2>
+
+                <!-- Tab Buttons -->
+                <div class="border-b border-gray-200 mb-6">
+                    <nav class="-mb-px flex justify-center space-x-2 md:space-x-8" aria-label="Tabs">
+                        <button class="tab-btn active whitespace-nowrap py-3 px-4 border-b-4 font-medium text-lg rounded-t-lg transition-colors duration-200" data-tab="feed">
+                            Feed Requirement
+                        </button>
+                        <button class="tab-btn whitespace-nowrap py-3 px-4 border-b-4 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-lg rounded-t-lg transition-colors duration-200" data-tab="vax">
+                            Vaccination & Health
+                        </button>
+                        <button class="tab-btn whitespace-nowrap py-3 px-4 border-b-4 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-lg rounded-t-lg transition-colors duration-200" data-tab="housing">
+                            Housing Management
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Tab Content -->
+                <div>
+                    <!-- Feed Content -->
+                    <div id="feed-content" class="tab-content space-y-4">
+                        <!-- Content will be injected by JS -->
+                    </div>
+                    <!-- Vaccination Content -->
+                    <div id="vax-content" class="tab-content hidden space-y-4">
+                        <!-- Content will be injected by JS -->
+                    </div>
+                    <!-- Housing Content -->
+                    <div id="housing-content" class="tab-content hidden space-y-4">
+                        <!-- Content will be injected by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Error Modal -->
+    <div id="error-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div class="modal bg-white rounded-lg shadow-2xl p-6 md:p-8 max-w-sm w-full text-center">
+            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                <!-- Heroicon: exclamation -->
+                <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <h3 class="text-lg leading-6 font-bold text-gray-900 mt-4" id="modal-title">Validation Error</h3>
+            <div class="mt-2">
+                <p class="text-sm text-gray-600" id="modal-message">Please fill out all required fields.</p>
+            </div>
+            <div class="mt-6">
+                <button id="modal-close-btn" type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('management-form');
+            const purposeSelect = document.getElementById('purpose');
+            const fatteningFields = document.getElementById('fattening-fields');
+            const milkFields = document.getElementById('milk-fields');
+            const outputSection = document.getElementById('output-section');
+            const tabs = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const animalTypeHeading = document.getElementById('animal-type-heading');
+
+            // Error Modal Elements
+            const errorModal = document.getElementById('error-modal');
+            const modalMessage = document.getElementById('modal-message');
+            const modalCloseBtn = document.getElementById('modal-close-btn');
+
+            // --- Helper Functions ---
+
+            /**
+             * Adds a number of days to a given date.
+             * @param {Date} date - The starting date.
+             * @param {number} days - The number of days to add.
+             * @returns {Date} The new date.
+             */
+            function addDays(date, days) {
+                const result = new Date(date);
+                result.setDate(result.getDate() + days);
+                return result;
+            }
+
+            /**
+             * Formats a Date object as "DD-Mon-YYYY" (e.g., 20-Nov-2025).
+             * @param {Date} date - The date to format.
+             * @returns {string} The formatted date string.
+             */
+            function formatDate(date) {
+                if (!date || isNaN(date)) return "Invalid Date";
+                return date.toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                }).replace(/ /g, '-');
+            }
+
+            /**
+             * Shows the error modal with a specific message.
+             * @param {string} message - The error message to display.
+             */
+            function showError(message) {
+                modalMessage.textContent = message;
+                errorModal.classList.remove('hidden');
+            }
+
+            // Close modal listener
+            modalCloseBtn.addEventListener('click', () => {
+                errorModal.classList.add('hidden');
+            });
+
+            // --- Data Generation Logic ---
+
+            const dataGenerators = {
+                // --- CATTLE DATA ---
+                Cattle: {
+                    Fattening: (weight, adg) => ({
+                        feed: `
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4">90-Day Fattening Feed Plan (Cattle)</h3>
+                            <p class="mb-4 text-gray-600">Based on ${weight}kg initial weight and ${adg || 700}gm/day target ADG. This plan utilizes common Bangladeshi feedstuffs like UMS (Urea Molasses Straw) and local concentrate mixes.</p>
+                            <div class="overflow-x-auto rounded-lg border border-gray-200">
+                                <table class="w-full divide-y divide-gray-200 output-table">
+                                    <thead class="bg-gray-100">
+                                        <tr>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Period</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Daily Ration per Animal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        <tr>
+                                            <td class="px-4 py-3 font-medium">Days 1-30 (Starter)</td>
+                                            <td class="px-4 py-3 text-gray-700"><strong>Green Grass:</strong> 5-7 kg<br><strong>UMS:</strong> 3-4 kg (ad lib)<br><strong>Concentrate Mix:</strong> 1.5 kg (30% Rice Bran, 30% Wheat Bran, 20% MOC, 15% Gram Husk, 3% DCP, 2% Salt)</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 font-medium">Days 31-60 (Grower)</td>
+                                            <td class="px-4 py-3 text-gray-700"><strong>Green Grass:</strong> 7-10 kg<br><strong>UMS:</strong> 4-5 kg (ad lib)<br><strong>Concentrate Mix:</strong> 2.0 - 2.5 kg (Same mix as above)</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 font-medium">Days 61-90 (Finisher)</td>
+                                            <td class="px-4 py-3 text-gray-700"><strong>Green Grass:</strong> 5-8 kg (reduce roughage)<br><strong>UMS:</strong> 3-4 kg<br><strong>Concentrate Mix:</strong> 3.0 - 3.5 kg (Increase energy: add 10% Maize/Broken Rice)</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p class="mt-4 text-sm text-gray-600"><strong>Important:</strong> Ensure clean drinking water (ad libitum) and provide a mineral block.</p>
+                        `,
+                        vax: (arrivalDate) => [
+                            { name: "Deworming (Albendazole/Fenbendazole)", date: addDays(arrivalDate, 2) },
+                            { name: "FMD (Foot & Mouth Disease) Vaccine", date: addDays(arrivalDate, 7) },
+                            { name: "Anthrax Vaccine", date: addDays(arrivalDate, 14) },
+                            { name: "HS-BQ (Hemorrhagic Septicemia & Black Quarter) Vaccine", date: addDays(arrivalDate, 21) },
+                            { name: "FMD Booster Dose", date: addDays(arrivalDate, 35) },
+                            { name: "Repeat Deworming", date: addDays(arrivalDate, 90) }
+                        ],
+                        housing: `
+                            <ul class="list-disc list-inside space-y-2 text-gray-700">
+                                <li><strong>Space:</strong> Provide 3.5 - 4.0 sq. meters per animal in a well-ventilated, dry shed.</li>
+                                <li><strong>Floor:</strong> Concrete floor with a gentle slope for drainage. Use dry straw or rice husk as bedding (2-3 inches).</li>
+                                <li><strong>Manger:</strong> Provide 0.6-0.75 meters of manger space per animal. Clean daily.</li>
+                                <li><strong>Water:</strong> Ensure 24/7 access to clean, fresh drinking water. Troughs should be cleaned daily.</li>
+                                <li><strong>Ventilation:</strong> Good cross-ventilation is crucial to prevent heat stress and respiratory issues.</li>
+                                <li><strong>Biosecurity:</strong> Use footbaths (e.g., with lime or potash) at the entrance.</li>
+                            </ul>
+                        `
+                    }),
+                    "Milk Production": (weight, milkYield) => ({
+                        feed: `
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4">Daily Feed Plan (Lactating Cattle)</h3>
+                            <p class="mb-4 text-gray-600">Based on ${weight}kg weight and ${milkYield || 8} Liters/day yield. Ration is split into Maintenance and Production.</p>
+                            <ul class="space-y-3">
+                                <li class="p-4 bg-gray-50 rounded-lg border">
+                                    <strong class="text-gray-800">1. Maintenance Ration (for ${weight}kg body weight):</strong>
+                                    <ul class="list-disc list-inside ml-4 text-gray-700">
+                                        <li><strong>Green Grass (Napier/Para/Maize):</strong> 15 - 20 kg</li>
+                                        <li><strong>Dry Roughage (Paddy Straw):</strong> 4 - 5 kg</li>
+                                        <li>Mineral Block & Salt Lick: Ad libitum</li>
+                                    </ul>
+                                </li>
+                                <li class="p-4 bg-green-50 rounded-lg border border-green-200">
+                                    <strong class="text-green-800">2. Production Ration (for ${milkYield || 8} L milk):</strong>
+                                    <p class="text-gray-700">Provide <strong>1 kg</strong> of concentrate mix for every <strong>2.5 Liters</strong> of milk.</p>
+                                    <p class="text-lg font-bold text-green-700 mt-2">Total Daily Concentrate: ${((milkYield || 8) / 2.5).toFixed(2)} kg</p>
+                                    <p class="text-sm text-gray-600 mt-2"><strong>Recommended Concentrate Mix:</strong> 25% Wheat Bran, 30% Rice Bran, 25% Mustard Oil Cake, 15% Gram/Pulse Husk, 3% DCP, 2% Salt.</p>
+                                </li>
+                            </ul>
+                        `,
+                        vax: (arrivalDate) => [
+                            { name: "Deworming (Broad Spectrum)", date: addDays(arrivalDate, 2) },
+                            { name: "FMD Vaccine", date: addDays(arrivalDate, 7) },
+                            { name: "HS-BQ Vaccine", date: addDays(arrivalDate, 21) },
+                            { name: "Anthrax Vaccine", date: addDays(arrivalDate, 30) },
+                            { name: "Annual Booster (FMD, HS-BQ)", date: "Every 6 months" },
+                            { name: "Mastitis Check", date: "Check daily before milking" }
+                        ],
+                        housing: `
+                            <ul class="list-disc list-inside space-y-2 text-gray-700">
+                                <li><strong>Space:</strong> 4.0 sq. meters per cow, plus 1.0-1.2 meters wide standing space (stall).</li>
+                                <li><strong>Hygiene:</strong> CRITICAL for milk production. Clean sheds twice daily. Wash udder before milking.</li>
+                                <li><strong>Floor:</strong> Non-slip concrete floor with proper drainage. Bedding is essential.</li>
+                                <li><strong>Ventilation:</strong> High-roof and open-sided sheds are ideal for Bangladesh. Fans may be needed in extreme heat.</li>
+                                <li><strong>Water:</strong> Lactating cows drink a lot (60-80 Liters). Ensure constant access to clean water.</li>
+                            </ul>
+                        `
+                    }),
+                    Breeding: (weight) => ({
+                        feed: `
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4">Feed Plan (Breeding Bull/Heifer)</h3>
+                            <p class="mb-4 text-gray-600">Focus on balanced nutrition, not fattening. Based on ${weight}kg weight.</p>
+                            <ul class="list-disc list-inside ml-4 text-gray-700 space-y-2">
+                                <li><strong>Green Grass:</strong> 20 - 25 kg (ad libitum). High-quality grass is essential.</li>
+                                <li><strong>Dry Roughage (Straw):</strong> 3 - 4 kg.</li>
+                                <li><strong>Concentrate Mix:</strong> 1.5 - 2.0 kg daily to maintain body condition score (BCS) of 3.0-3.5.</li>
+                                <li><strong>Flushing (Heifers):</strong> Increase concentrate to 2.5 kg for 3 weeks before breeding season to improve conception.</li>
+                                <li><strong>Minerals:</strong> High-quality mineral mixture (with Phosphorus) is vital for fertility.</li>
+                            </ul>
+                        `,
+                        vax: (arrivalDate) => [
+                            { name: "Deworming", date: addDays(arrivalDate, 2) },
+                            { name: "FMD Vaccine", date: addDays(arrivalDate, 7) },
+                            { name: "HS-BQ Vaccine", date: addDays(arrivalDate, 21) },
+                            { name: "Brucellosis (Heifers, if not vaccinated)", date: addDays(arrivalDate, 45) },
+                            { name: "Annual Boosters (FMD, HS-BQ, Anthrax)", date: "As per schedule" }
+                        ],
+                        housing: `
+                            <ul class="list-disc list-inside space-y-2 text-gray-700">
+                                <li><strong>Bull Housing:</strong> Bulls must be housed individually in strong pens (12-15 sq. meters).</li>
+                                <li><strong>Heifer Housing:</strong> Group housing is acceptable (3.5-4.0 sq. meters per animal).</li>
+                                <li><strong>Floor:</strong> Non-slip floor is essential to prevent injuries during mounting.</li>
+                                <li><strong>Paddock:</strong> Access to an open paddock for exercise (at least 1 hour/day) is highly recommended for fertility.</li>
+                            </ul>
+                        `
+                    })
+                },
+                // --- BUFFALO DATA ---
+                Buffalo: {
+                    Fattening: (weight, adg) => dataGenerators.Cattle.Fattening(weight, adg || 600), // Use Cattle logic, slightly lower ADG
+                    "Milk Production": (weight, milkYield) => ({
+                        feed: `
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4">Daily Feed Plan (Lactating Buffalo)</h3>
+                            <p class="mb-4 text-gray-600">Based on ${weight}kg weight and ${milkYield || 6} Liters/day yield. Buffalo milk is denser.</p>
+                            <ul class="space-y-3">
+                                <li class="p-4 bg-gray-50 rounded-lg border">
+                                    <strong class="text-gray-800">1. Maintenance Ration (for ${weight}kg body weight):</strong>
+                                    <ul class="list-disc list-inside ml-4 text-gray-700">
+                                        <li><strong>Green Grass (Napier/Para):</strong> 20 - 25 kg</li>
+                                        <li><strong>Dry Roughage (Paddy Straw):</strong> 5 - 6 kg (Buffalo are excellent roughage converters)</li>
+                                    </ul>
+                                </li>
+                                <li class="p-4 bg-green-50 rounded-lg border border-green-200">
+                                    <strong class="text-green-800">2. Production Ration (for ${milkYield || 6} L milk):</strong>
+                                    <p class="text-gray-700">Provide <strong>1 kg</strong> of concentrate mix for every <strong>2.0 Liters</strong> of milk.</p>
+                                    <p class="text-lg font-bold text-green-700 mt-2">Total Daily Concentrate: ${((milkYield || 6) / 2.0).toFixed(2)} kg</p>
+                                    <p class="text-sm text-gray-600 mt-2"><strong>Recommended Concentrate Mix:</strong> 25% Wheat Bran, 20% Rice Bran, 30% Mustard Oil Cake, 20% Gram/Pulse Husk, 3% DCP, 2% Salt.</p>
+                                </li>
+                            </ul>
+                        `,
+                        vax: (arrivalDate) => [
+                            { name: "Deworming (Broad Spectrum)", date: addDays(arrivalDate, 2) },
+                            { name: "FMD Vaccine", date: addDays(arrivalDate, 7) },
+                            { name: "HS-BQ Vaccine", date: addDays(arrivalDate, 21) },
+                            { name: "Anthrax Vaccine", date: addDays(arrivalDate, 30) },
+                            { name: "Annual Booster (FMD, HS-BQ)", date: "Every 6 months" },
+                            { name: "Mastitis Check", date: "Check daily before milking" }
+                        ],
+                        housing: `
+                            <ul class="list-disc list-inside space-y-2 text-gray-700">
+                                <li><strong>Space:</strong> 4.0 - 4.5 sq. meters per animal. Buffalo are larger.</li>
+                                <li><strong>Wallowing:</strong> CRITICAL for buffalo. Provide a wallowing tank or daily showering (2-3 times) to manage heat stress.</li>
+                                <li><strong>Shade:</strong> Must have adequate shade. Buffalo are more susceptible to heat stroke.</li>
+                                <li><strong>Floor:</strong> Concrete, non-slip, easy to clean.</li>
+                            </ul>
+                        `
+                    }),
+                    Breeding: (weight) => dataGenerators.Cattle.Breeding(weight) // Same logic
+                },
+                // --- GOAT DATA ---
+                Goat: {
+                    Fattening: (weight, adg) => ({
+                        feed: `
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4">90-Day Fattening Feed Plan (Goat)</h3>
+                            <p class="mb-4 text-gray-600">Based on ${weight}kg initial weight. Goats are browsers, so tree fodder is excellent. Target ADG: ${adg || 100}gm/day.</p>
+                            <div class="overflow-x-auto rounded-lg border border-gray-200">
+                                <table class="w-full divide-y divide-gray-200 output-table">
+                                    <thead class="bg-gray-100">
+                                        <tr>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Period</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Daily Ration per Animal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        <tr>
+                                            <td class="px-4 py-3 font-medium">Days 1-30</td>
+                                            <td class="px-4 py-3 text-gray-700"><strong>Tree Fodder (Jackfruit/Ipil-ipil leaves):</strong> 1.5 - 2.0 kg<br><strong>Green Grass (Napier):</strong> 1.0 kg<br><strong>Concentrate Mix:</strong> 150 - 200 gm</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 font-medium">Days 31-60</td>
+                                            <td class="px-4 py-3 text-gray-700"><strong>Tree Fodder:</strong> 2.0 - 2.5 kg<br><strong>Green Grass:</strong> 1.0 kg<br><strong>Concentrate Mix:</strong> 200 - 250 gm</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 font-medium">Days 61-90</td>
+                                            <td class="px-4 py-3 text-gray-700"><strong>Tree Fodder:</strong> 1.5 kg<br><strong>Green Grass:</strong> 0.5 kg<br><strong>Concentrate Mix:</strong> 300 - 350 gm (add 10% maize grain)</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p class="mt-4 text-sm text-gray-600"><strong>Concentrate Mix:</strong> 35% Wheat Bran, 20% Rice Polish, 20% MOC, 20% Gram Husk, 3% DCP, 2% Salt.</p>
+                        `,
+                        vax: (arrivalDate) => [
+                            { name: "Deworming (Broad Spectrum)", date: addDays(arrivalDate, 2) },
+                            { name: "PPR Vaccine", date: addDays(arrivalDate, 7) },
+                            { name: "Anthrax Vaccine", date: addDays(arrivalDate, 14) },
+                            { name: "Goat Pox Vaccine", date: addDays(arrivalDate, 21) },
+                            { name: "FMD Vaccine", date: addDays(arrivalDate, 35) },
+                            { name: "Repeat Deworming", date: addDays(arrivalDate, 90) }
+                        ],
+                        housing: `
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4">"Machan" (Raised Platform) Housing</h3>
+                            <ul class="list-disc list-inside space-y-2 text-gray-700">
+                                <li><strong>Floor:</strong> Raised platform (4-5 ft above ground) made of wooden or bamboo slats. This is ESSENTIAL in Bangladesh to prevent worms and foot rot.</li>
+                                <li><strong>Space:</strong> 1.5 - 2.0 sq. meters per adult goat.</li>
+                                <li><strong>Ventilation:</strong> Walls should be slatted or wire mesh for excellent airflow.</li>
+                                <li><strong>Roof:</strong> Tin or thatch roof with an overhang to prevent rain from entering.</li>
+                                <li><strong>Cleaning:</strong> Droppings fall through the slats, making it easy to clean underneath.</li>
+                            </ul>
+                        `
+                    }),
+                    "Milk Production": (weight, milkYield) => ({
+                        feed: `
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4">Daily Feed Plan (Lactating Goat)</h3>
+                            <p class="mb-4 text-gray-600">Based on ${weight}kg weight and ${milkYield || 1.5} L/day yield.</p>
+                            <ul class="list-disc list-inside ml-4 text-gray-700 space-y-2">
+                                <li><strong>High-Quality Green Fodder:</strong> 3-4 kg (Mix of leguminous fodder like Ipil-ipil and grasses).</li>
+                                <li><strong>Concentrate Mix:</strong> 250-300 gm per day for maintenance, PLUS 200-250 gm extra for every 1 Liter of milk.</li>
+                                <li><strong>Total Concentrate:</strong> ${(0.3 + (milkYield || 1.5) * 0.25).toFixed(2)} kg/day.</li>
+                                <li><strong>Water:</strong> Clean, fresh water must be available at all times.</li>
+                            </ul>
+                        `,
+                        vax: (arrivalDate) => [
+                            { name: "Deworming", date: addDays(arrivalDate, 2) },
+                            { name: "PPR Vaccine", date: addDays(arrivalDate, 7) },
+                            { name: "Anthrax Vaccine", date: addDays(arrivalDate, 14) },
+                            { name: "FMD Vaccine", date: addDays(arrivalDate, 21) },
+                            { name: "HS-BQ (if in endemic area)", date: addDays(arrivalDate, 30) },
+                            { name: "Regular Deworming", date: "Every 3-4 months" }
+                        ],
+                        housing: `
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4">"Machan" (Raised Platform) Housing</h3>
+                            <ul class="list-disc list-inside space-y-2 text-gray-700">
+                                <li><strong>Floor:</strong> Raised platform (4-5 ft above ground) is highly recommended.</li>
+                                <li><strong>Space:</strong> 1.5 - 2.0 sq. meters per adult doe. Provide separate, clean kidding pens.</li>
+                                <li><strong>Hygiene:</strong> Keep the house dry and clean. Disinfect kidding pens before use.</li>
+                                <li><strong>Mangers:</strong> Hang feed mangers outside the pen to prevent contamination.</li>
+                            </ul>
+                        `
+                    }),
+                    Breeding: (weight) => ({
+                        feed: `
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4">Feed Plan (Breeding Goat)</h3>
+                            <p class="mb-4 text-gray-600">Focus on health and fertility. Based on ${weight}kg weight.</p>
+                            <ul class="list-disc list-inside ml-4 text-gray-700 space-y-2">
+                                <li><strong>High-Quality Fodder:</strong> Ad libitum (3-5 kg/day). Mix of grasses and tree leaves.</li>
+                                <li><strong>Concentrate Mix (Bucks):</strong> 300-400 gm/day to maintain good libido.</li>
+                                <li><strong>Flushing (Does):</strong> Increase concentrate to 300 gm/day for 2-3 weeks before breeding.</li>
+                                <li><strong>Minerals:</strong> Provide mineral block, especially with Zinc and Phosphorus.</li>
+                            </ul>
+                        `,
+                        vax: (arrivalDate) => [
+                            { name: "Deworming", date: addDays(arrivalDate, 2) },
+                            { name: "PPR Vaccine", date: addDays(arrivalDate, 7) },
+                            { name: "Anthrax Vaccine", date: addDays(arrivalDate, 14) },
+                            { name: "FMD Vaccine", date: addDays(arrivalDate, 21) },
+                            { name: "Goat Pox Vaccine", date: addDays(arrivalDate, 30) },
+                            { name: "Annual Boosters (PPR, FMD, Anthrax)", date: "Every year" }
+                        ],
+                        housing: `
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4">Breeding Housing</h3>
+                            <ul class="list-disc list-inside space-y-2 text-gray-700">
+                                <li><strong>Buck Housing:</strong> House breeding bucks in a separate, strong pen (2.5 sq. meters) to prevent fighting and uncontrolled mating.</li>
+                                <li><strong>Doe Housing:</strong> Group housing in a 'Machan' shed is ideal.</li>
+                                <li><strong>Ventilation:</strong> Must have excellent airflow.</li>
+                            </ul>
+                        `
+                    })
+                },
+                // --- SHEEP DATA ---
+                Sheep: {
+                    // Sheep logic can be very similar to Goat, with minor tweaks.
+                    Fattening: (weight, adg) => dataGenerators.Goat.Fattening(weight, adg || 120), // Use Goat logic
+                    "Milk Production": (weight, milkYield) => dataGenerators.Goat["Milk Production"](weight, milkYield || 0.5), // Use Goat logic, ensuring key matches
+                    Breeding: (weight) => dataGenerators.Goat.Breeding(weight) // Use Goat logic
+                }
+            };
+            
+
+            // --- Event Listeners ---
+
+            // Toggle conditional fields based on purpose
+            purposeSelect.addEventListener('change', () => {
+                const purpose = purposeSelect.value;
+                fatteningFields.classList.toggle('hidden', purpose !== 'Fattening');
+                milkFields.classList.toggle('hidden', purpose !== 'Milk Production');
+            });
+
+            // Handle form submission
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                // Get form data
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+                
+                const { 
+                    'livestock-type': type, 
+                    'arrival-date': dateStr, 
+                    'initial-weight': weight, 
+                    'purpose': purpose,
+                    'adg': adg,
+                    'milk-yield': milkYield
+                } = data;
+
+                // Validation
+                if (!type || !dateStr || !weight || !purpose) {
+                    showError("Please fill in all main fields: Type, Arrival Date, Weight, and Purpose.");
+                    return;
+                }
+                
+                const arrivalDate = new Date(dateStr);
+                if (isNaN(arrivalDate.getTime())) { // More robust check for Invalid Date
+                    showError("The Arrival Date is invalid. Please select a valid date.");
+                    return;
+                }
+
+                // --- New Validation for Conditional Fields ---
+                if (purpose === 'Fattening' && !adg) {
+                    showError("Please enter a 'Target ADG (gm/day)' for Fattening.");
+                    return;
+                }
+
+                if (purpose === 'Milk Production' && !milkYield) {
+                    showError("Please enter a 'Daily Milk Yield (Liters)' for Milk Production.");
+                    return;
+                }
+                // --- End of New Validation ---
+
+                // Get the correct generator
+                const generator = dataGenerators[type]?.[purpose];
+
+                if (!generator) {
+                    showError("Could not find a management plan for the selected combination.");
+                    return;
+                }
+
+                // Generate the plan
+                const relevantValue = purpose === 'Fattening' ? parseFloat(adg) : parseFloat(milkYield);
+                const plan = generator(parseFloat(weight), relevantValue);
+
+                // --- Render Output ---
+
+                // 1. Animal Type Heading
+                animalTypeHeading.textContent = `${type} (${purpose})`;
+                
+                // 2. Feed Plan
+                document.getElementById('feed-content').innerHTML = plan.feed;
+
+                // 3. Vaccination Plan
+                const vaxList = plan.vax(arrivalDate)
+                    .map(vax => `
+                        <li class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border vax-list-item transition-all duration-200">
+                            <span class="font-medium text-gray-800">${vax.name}</span>
+                            <span class="font-bold text-blue-600">${vax.date instanceof Date ? formatDate(vax.date) : vax.date}</span>
+                        </li>
+                    `)
+                    .join('');
+                document.getElementById('vax-content').innerHTML = `
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Vaccination & Health Schedule</h3>
+                    <p class="text-sm text-gray-600 mb-4">Dates are calculated from your arrival date of ${formatDate(arrivalDate)}. Consult a veterinarian for local adjustments.</p>
+                    <ul class="space-y-3">${vaxList}</ul>
+                `;
+
+                // 4. Housing Plan
+                document.getElementById('housing-content').innerHTML = `
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Housing & Management Guidelines</h3>
+                    ${plan.housing}
+                `;
+
+                // Show the output section and scroll to it
+                // Re-trigger animation
+                outputSection.classList.remove('output-section-animated');
+                // A tiny delay to allow the class to be removed before adding it
+                setTimeout(() => {
+                    outputSection.classList.remove('hidden');
+                    outputSection.classList.add('output-section-animated');
+                    outputSection.scrollIntoView({ behavior: 'smooth' });
+                }, 50);
+
+
+                // Reset tabs to the first one
+                tabs.forEach((t, i) => t.classList.toggle('active', i === 0));
+                tabContents.forEach((c, i) => c.classList.toggle('hidden', i !== 0));
+            });
+
+            // Handle Tab Switching
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Deactivate all tabs
+                    tabs.forEach(t => t.classList.remove('active'));
+                    // Activate clicked tab
+                    tab.classList.add('active');
+
+                    const targetTab = tab.getAttribute('data-tab');
+                    
+                    // Hide all content
+                    tabContents.forEach(content => {
+                        content.classList.add('hidden');
+                    });
+
+                    // Show target content
+                    document.getElementById(`${targetTab}-content`).classList.remove('hidden');
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
