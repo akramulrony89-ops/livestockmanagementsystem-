@@ -12,7 +12,7 @@
         /* Use Inter as the default font */
         body {
             font-family: 'Inter', sans-serif;
-            /* New colorful background gradient */
+            /* Colorful background gradient */
             background: linear-gradient(135deg, #e0f7fa 0%, #f0fdf4 100%);
             min-height: 100vh;
         }
@@ -244,23 +244,12 @@
 
             // --- Helper Functions ---
 
-            /**
-             * Adds a number of days to a given date.
-             * @param {Date} date - The starting date.
-             * @param {number} days - The number of days to add.
-             * @returns {Date} The new date.
-             */
             function addDays(date, days) {
                 const result = new Date(date);
                 result.setDate(result.getDate() + days);
                 return result;
             }
 
-            /**
-             * Formats a Date object as "DD-Mon-YYYY" (e.g., 20-Nov-2025).
-             * @param {Date} date - The date to format.
-             * @returns {string} The formatted date string.
-             */
             function formatDate(date) {
                 if (!date || isNaN(date)) return "Invalid Date";
                 return date.toLocaleDateString('en-GB', {
@@ -270,10 +259,6 @@
                 }).replace(/ /g, '-');
             }
 
-            /**
-             * Shows the error modal with a specific message.
-             * @param {string} message - The error message to display.
-             */
             function showError(message) {
                 modalMessage.textContent = message;
                 errorModal.classList.remove('hidden');
@@ -289,280 +274,339 @@
             const dataGenerators = {
                 // --- CATTLE DATA ---
                 Cattle: {
-                    Fattening: (weight, adg) => ({
-                        feed: `
-                            <h3 class="text-xl font-semibold text-gray-800 mb-4">90-Day Fattening Feed Plan (Cattle)</h3>
-                            <p class="mb-4 text-gray-600">Based on ${weight}kg initial weight and ${adg || 700}gm/day target ADG. This plan utilizes common Bangladeshi feedstuffs like UMS (Urea Molasses Straw) and local concentrate mixes.</p>
-                            <div class="overflow-x-auto rounded-lg border border-gray-200">
-                                <table class="w-full divide-y divide-gray-200 output-table">
-                                    <thead class="bg-gray-100">
-                                        <tr>
-                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Period</th>
-                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Daily Ration per Animal</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="bg-white divide-y divide-gray-200">
-                                        <tr>
-                                            <td class="px-4 py-3 font-medium">Days 1-30 (Starter)</td>
-                                            <td class="px-4 py-3 text-gray-700"><strong>Green Grass:</strong> 5-7 kg<br><strong>UMS:</strong> 3-4 kg (ad lib)<br><strong>Concentrate Mix:</strong> 1.5 kg (30% Rice Bran, 30% Wheat Bran, 20% MOC, 15% Gram Husk, 3% DCP, 2% Salt)</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-4 py-3 font-medium">Days 31-60 (Grower)</td>
-                                            <td class="px-4 py-3 text-gray-700"><strong>Green Grass:</strong> 7-10 kg<br><strong>UMS:</strong> 4-5 kg (ad lib)<br><strong>Concentrate Mix:</strong> 2.0 - 2.5 kg (Same mix as above)</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-4 py-3 font-medium">Days 61-90 (Finisher)</td>
-                                            <td class="px-4 py-3 text-gray-700"><strong>Green Grass:</strong> 5-8 kg (reduce roughage)<br><strong>UMS:</strong> 3-4 kg<br><strong>Concentrate Mix:</strong> 3.0 - 3.5 kg (Increase energy: add 10% Maize/Broken Rice)</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <p class="mt-4 text-sm text-gray-600"><strong>Important:</strong> Ensure clean drinking water (ad libitum) and provide a mineral block.</p>
-                        `,
-                        vax: (arrivalDate) => [
-                            { name: "Deworming (Albendazole/Fenbendazole)", date: addDays(arrivalDate, 2) },
-                            { name: "FMD (Foot & Mouth Disease) Vaccine", date: addDays(arrivalDate, 7) },
-                            { name: "Anthrax Vaccine", date: addDays(arrivalDate, 14) },
-                            { name: "HS-BQ (Hemorrhagic Septicemia & Black Quarter) Vaccine", date: addDays(arrivalDate, 21) },
-                            { name: "FMD Booster Dose", date: addDays(arrivalDate, 35) },
-                            { name: "Repeat Deworming", date: addDays(arrivalDate, 90) }
-                        ],
-                        housing: `
-                            <ul class="list-disc list-inside space-y-2 text-gray-700">
-                                <li><strong>Space:</strong> Provide 3.5 - 4.0 sq. meters per animal in a well-ventilated, dry shed.</li>
-                                <li><strong>Floor:</strong> Concrete floor with a gentle slope for drainage. Use dry straw or rice husk as bedding (2-3 inches).</li>
-                                <li><strong>Manger:</strong> Provide 0.6-0.75 meters of manger space per animal. Clean daily.</li>
-                                <li><strong>Water:</strong> Ensure 24/7 access to clean, fresh drinking water. Troughs should be cleaned daily.</li>
-                                <li><strong>Ventilation:</strong> Good cross-ventilation is crucial to prevent heat stress and respiratory issues.</li>
-                                <li><strong>Biosecurity:</strong> Use footbaths (e.g., with lime or potash) at the entrance.</li>
-                            </ul>
-                        `
-                    }),
-                    "Milk Production": (weight, milkYield) => ({
-                        feed: `
-                            <h3 class="text-xl font-semibold text-gray-800 mb-4">Daily Feed Plan (Lactating Cattle)</h3>
-                            <p class="mb-4 text-gray-600">Based on ${weight}kg weight and ${milkYield || 8} Liters/day yield. Ration is split into Maintenance and Production.</p>
-                            <ul class="space-y-3">
-                                <li class="p-4 bg-gray-50 rounded-lg border">
-                                    <strong class="text-gray-800">1. Maintenance Ration (for ${weight}kg body weight):</strong>
-                                    <ul class="list-disc list-inside ml-4 text-gray-700">
-                                        <li><strong>Green Grass (Napier/Para/Maize):</strong> 15 - 20 kg</li>
-                                        <li><strong>Dry Roughage (Paddy Straw):</strong> 4 - 5 kg</li>
-                                        <li>Mineral Block & Salt Lick: Ad libitum</li>
-                                    </ul>
-                                </li>
-                                <li class="p-4 bg-green-50 rounded-lg border border-green-200">
-                                    <strong class="text-green-800">2. Production Ration (for ${milkYield || 8} L milk):</strong>
-                                    <p class="text-gray-700">Provide <strong>1 kg</strong> of concentrate mix for every <strong>2.5 Liters</strong> of milk.</p>
-                                    <p class="text-lg font-bold text-green-700 mt-2">Total Daily Concentrate: ${((milkYield || 8) / 2.5).toFixed(2)} kg</p>
-                                    <p class="text-sm text-gray-600 mt-2"><strong>Recommended Concentrate Mix:</strong> 25% Wheat Bran, 30% Rice Bran, 25% Mustard Oil Cake, 15% Gram/Pulse Husk, 3% DCP, 2% Salt.</p>
-                                </li>
-                            </ul>
-                        `,
-                        vax: (arrivalDate) => [
-                            { name: "Deworming (Broad Spectrum)", date: addDays(arrivalDate, 2) },
-                            { name: "FMD Vaccine", date: addDays(arrivalDate, 7) },
-                            { name: "HS-BQ Vaccine", date: addDays(arrivalDate, 21) },
-                            { name: "Anthrax Vaccine", date: addDays(arrivalDate, 30) },
-                            { name: "Annual Booster (FMD, HS-BQ)", date: "Every 6 months" },
-                            { name: "Mastitis Check", date: "Check daily before milking" }
-                        ],
-                        housing: `
-                            <ul class="list-disc list-inside space-y-2 text-gray-700">
-                                <li><strong>Space:</strong> 4.0 sq. meters per cow, plus 1.0-1.2 meters wide standing space (stall).</li>
-                                <li><strong>Hygiene:</strong> CRITICAL for milk production. Clean sheds twice daily. Wash udder before milking.</li>
-                                <li><strong>Floor:</strong> Non-slip concrete floor with proper drainage. Bedding is essential.</li>
-                                <li><strong>Ventilation:</strong> High-roof and open-sided sheds are ideal for Bangladesh. Fans may be needed in extreme heat.</li>
-                                <li><strong>Water:</strong> Lactating cows drink a lot (60-80 Liters). Ensure constant access to clean water.</li>
-                            </ul>
-                        `
-                    }),
-                    Breeding: (weight) => ({
-                        feed: `
-                            <h3 class="text-xl font-semibold text-gray-800 mb-4">Feed Plan (Breeding Bull/Heifer)</h3>
-                            <p class="mb-4 text-gray-600">Focus on balanced nutrition, not fattening. Based on ${weight}kg weight.</p>
-                            <ul class="list-disc list-inside ml-4 text-gray-700 space-y-2">
-                                <li><strong>Green Grass:</strong> 20 - 25 kg (ad libitum). High-quality grass is essential.</li>
-                                <li><strong>Dry Roughage (Straw):</strong> 3 - 4 kg.</li>
-                                <li><strong>Concentrate Mix:</strong> 1.5 - 2.0 kg daily to maintain body condition score (BCS) of 3.0-3.5.</li>
-                                <li><strong>Flushing (Heifers):</strong> Increase concentrate to 2.5 kg for 3 weeks before breeding season to improve conception.</li>
-                                <li><strong>Minerals:</strong> High-quality mineral mixture (with Phosphorus) is vital for fertility.</li>
-                            </ul>
-                        `,
-                        vax: (arrivalDate) => [
-                            { name: "Deworming", date: addDays(arrivalDate, 2) },
-                            { name: "FMD Vaccine", date: addDays(arrivalDate, 7) },
-                            { name: "HS-BQ Vaccine", date: addDays(arrivalDate, 21) },
-                            { name: "Brucellosis (Heifers, if not vaccinated)", date: addDays(arrivalDate, 45) },
-                            { name: "Annual Boosters (FMD, HS-BQ, Anthrax)", date: "As per schedule" }
-                        ],
-                        housing: `
-                            <ul class="list-disc list-inside space-y-2 text-gray-700">
-                                <li><strong>Bull Housing:</strong> Bulls must be housed individually in strong pens (12-15 sq. meters).</li>
-                                <li><strong>Heifer Housing:</strong> Group housing is acceptable (3.5-4.0 sq. meters per animal).</li>
-                                <li><strong>Floor:</strong> Non-slip floor is essential to prevent injuries during mounting.</li>
-                                <li><strong>Paddock:</strong> Access to an open paddock for exercise (at least 1 hour/day) is highly recommended for fertility.</li>
-                            </ul>
-                        `
-                    })
+                    Fattening: (weight, adg) => {
+                        // Calculate feed amounts based on body weight (BW)
+                        // Starter: ~1% BW Conc, 8% BW Grass (Fresh basis rule 6-8%)
+                        const startConc = (weight * 0.01).toFixed(1);
+                        const startGrass = (weight * 0.08).toFixed(1); // 8%
+                        
+                        // Grower: ~1.5% BW Conc, 7% BW Grass
+                        const growConc = (weight * 0.015).toFixed(1);
+                        const growGrass = (weight * 0.07).toFixed(1); // 7%
+
+                        // Finisher: ~2% BW Conc, 6% BW Grass
+                        const finishConc = (weight * 0.02).toFixed(1);
+                        const finishGrass = (weight * 0.06).toFixed(1); // 6%
+
+                        return {
+                            feed: `
+                                <h3 class="text-xl font-semibold text-gray-800 mb-4">90-Day Fattening Feed Plan (Beef Cattle)</h3>
+                                <p class="mb-4 text-gray-600">Based on <strong>${weight}kg</strong> initial weight and ${adg || 700}gm/day target ADG.</p>
+                                <div class="overflow-x-auto rounded-lg border border-gray-200">
+                                    <table class="w-full divide-y divide-gray-200 output-table">
+                                        <thead class="bg-gray-100">
+                                            <tr>
+                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Period</th>
+                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Daily Ration per Animal</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white divide-y divide-gray-200">
+                                            <tr>
+                                                <td class="px-4 py-3 font-medium">Days 1-30 (Starter)</td>
+                                                <td class="px-4 py-3 text-gray-700"><strong>Green Grass:</strong> ${startGrass} kg (8% BW)<br><strong>UMS:</strong> 3-4 kg (ad lib)<br><strong>Concentrate Mix:</strong> ${startConc} kg (30% Rice Bran, 30% Wheat Bran, 20% MOC, 15% Gram Husk, 3% DCP, 2% Salt)</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-4 py-3 font-medium">Days 31-60 (Grower)</td>
+                                                <td class="px-4 py-3 text-gray-700"><strong>Green Grass:</strong> ${growGrass} kg (7% BW)<br><strong>UMS:</strong> 4-5 kg (ad lib)<br><strong>Concentrate Mix:</strong> ${growConc} kg (Same mix)</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-4 py-3 font-medium">Days 61-90 (Finisher)</td>
+                                                <td class="px-4 py-3 text-gray-700"><strong>Green Grass:</strong> ${finishGrass} kg (6% BW)<br><strong>UMS:</strong> 3-4 kg<br><strong>Concentrate Mix:</strong> ${finishConc} kg (Increase energy: add 10% Maize)</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <p class="mt-4 text-sm text-gray-600"><strong>Note:</strong> Green fodder calculated at 6-8% of body weight.</p>
+                            `,
+                            vax: (arrivalDate) => [
+                                { name: "Deworming (Albendazole/Fenbendazole)", date: addDays(arrivalDate, 2) },
+                                { name: "FMD (Foot & Mouth Disease) Vaccine", date: addDays(arrivalDate, 7) },
+                                { name: "Anthrax Vaccine", date: addDays(arrivalDate, 14) },
+                                { name: "HS-BQ (Hemorrhagic Septicemia & Black Quarter) Vaccine", date: addDays(arrivalDate, 21) },
+                                { name: "FMD Booster Dose", date: addDays(arrivalDate, 35) },
+                                { name: "Repeat Deworming", date: addDays(arrivalDate, 90) }
+                            ],
+                            housing: `
+                                <ul class="list-disc list-inside space-y-2 text-gray-700">
+                                    <li><strong>Space:</strong> Provide 3.5 - 4.0 sq. meters per animal in a well-ventilated, dry shed.</li>
+                                    <li><strong>Floor:</strong> Concrete floor with a gentle slope for drainage. Use dry straw or rice husk as bedding (2-3 inches).</li>
+                                    <li><strong>Manger:</strong> Provide 0.6-0.75 meters of manger space per animal. Clean daily.</li>
+                                    <li><strong>Water:</strong> Ensure 24/7 access to clean, fresh drinking water. Troughs should be cleaned daily.</li>
+                                    <li><strong>Ventilation:</strong> Good cross-ventilation is crucial to prevent heat stress and respiratory issues.</li>
+                                    <li><strong>Biosecurity:</strong> Use footbaths (e.g., with lime or potash) at the entrance.</li>
+                                </ul>
+                            `
+                        };
+                    },
+                    "Milk Production": (weight, milkYield) => {
+                        // Rule: 8-10% BW Green Fodder
+                        const minGrass = (weight * 0.08).toFixed(1);
+                        const maxGrass = (weight * 0.10).toFixed(1);
+                        const maintStraw = (weight * 0.01).toFixed(1); // 1% BW straw
+
+                        return {
+                            feed: `
+                                <h3 class="text-xl font-semibold text-gray-800 mb-4">Daily Feed Plan (Lactating Dairy Cow)</h3>
+                                <p class="mb-4 text-gray-600">Based on <strong>${weight}kg</strong> weight and <strong>${milkYield || 8} Liters/day</strong> yield.</p>
+                                <ul class="space-y-3">
+                                    <li class="p-4 bg-gray-50 rounded-lg border">
+                                        <strong class="text-gray-800">1. Maintenance Ration (for ${weight}kg body weight):</strong>
+                                        <ul class="list-disc list-inside ml-4 text-gray-700">
+                                            <li><strong>Green Fodder:</strong> ${minGrass} - ${maxGrass} kg (8–10% of body weight).</li>
+                                            <li><strong>Dry Roughage (Paddy Straw):</strong> ${maintStraw} kg</li>
+                                            <li>Mineral Block & Salt Lick: Ad libitum</li>
+                                        </ul>
+                                    </li>
+                                    <li class="p-4 bg-green-50 rounded-lg border border-green-200">
+                                        <strong class="text-green-800">2. Production Ration (for ${milkYield || 8} L milk):</strong>
+                                        <p class="text-gray-700">Provide <strong>1 kg</strong> of concentrate mix for every <strong>2.5 Liters</strong> of milk.</p>
+                                        <p class="text-lg font-bold text-green-700 mt-2">Total Daily Concentrate: ${((milkYield || 8) / 2.5).toFixed(2)} kg</p>
+                                        <p class="text-sm text-gray-600 mt-2"><strong>Recommended Concentrate Mix:</strong> 25% Wheat Bran, 30% Rice Bran, 25% Mustard Oil Cake, 15% Gram/Pulse Husk, 3% DCP, 2% Salt.</p>
+                                    </li>
+                                </ul>
+                            `,
+                            vax: (arrivalDate) => [
+                                { name: "Deworming (Broad Spectrum)", date: addDays(arrivalDate, 2) },
+                                { name: "FMD Vaccine", date: addDays(arrivalDate, 7) },
+                                { name: "HS-BQ Vaccine", date: addDays(arrivalDate, 21) },
+                                { name: "Anthrax Vaccine", date: addDays(arrivalDate, 30) },
+                                { name: "Annual Booster (FMD, HS-BQ)", date: "Every 6 months" },
+                                { name: "Mastitis Check", date: "Check daily before milking" }
+                            ],
+                            housing: `
+                                <ul class="list-disc list-inside space-y-2 text-gray-700">
+                                    <li><strong>Space:</strong> 4.0 sq. meters per cow, plus 1.0-1.2 meters wide standing space (stall).</li>
+                                    <li><strong>Hygiene:</strong> CRITICAL for milk production. Clean sheds twice daily. Wash udder before milking.</li>
+                                    <li><strong>Floor:</strong> Non-slip concrete floor with proper drainage. Bedding is essential.</li>
+                                    <li><strong>Ventilation:</strong> High-roof and open-sided sheds are ideal for Bangladesh. Fans may be needed in extreme heat.</li>
+                                    <li><strong>Water:</strong> Lactating cows drink a lot (60-80 Liters). Ensure constant access to clean water.</li>
+                                </ul>
+                            `
+                        };
+                    },
+                    Breeding: (weight) => {
+                        // Rule: 5-6% BW Green Fodder
+                        const minGrass = (weight * 0.05).toFixed(1);
+                        const maxGrass = (weight * 0.06).toFixed(1);
+                        const conc = (weight * 0.005).toFixed(1); // 0.5% BW
+
+                        return {
+                            feed: `
+                                <h3 class="text-xl font-semibold text-gray-800 mb-4">Feed Plan (Breeding Bull/Heifer)</h3>
+                                <p class="mb-4 text-gray-600">Focus on balanced nutrition, not fattening. Based on <strong>${weight}kg</strong> weight.</p>
+                                <ul class="list-disc list-inside ml-4 text-gray-700 space-y-2">
+                                    <li><strong>Green Fodder:</strong> ${minGrass} - ${maxGrass} kg (5–6% of body weight). <em class="text-sm text-gray-500">Excess lush green can reduce libido; ensure some dry forage is available.</em></li>
+                                    <li><strong>Dry Roughage (Straw):</strong> 3 - 4 kg.</li>
+                                    <li><strong>Concentrate Mix:</strong> ${conc} - ${(parseFloat(conc) + 0.5).toFixed(1)} kg daily to maintain body condition score (BCS) of 3.0-3.5.</li>
+                                    <li><strong>Flushing (Heifers):</strong> Increase concentrate by 0.5 kg for 3 weeks before breeding season to improve conception.</li>
+                                    <li><strong>Minerals:</strong> High-quality mineral mixture (with Phosphorus) is vital for fertility.</li>
+                                </ul>
+                            `,
+                            vax: (arrivalDate) => [
+                                { name: "Deworming", date: addDays(arrivalDate, 2) },
+                                { name: "FMD Vaccine", date: addDays(arrivalDate, 7) },
+                                { name: "HS-BQ Vaccine", date: addDays(arrivalDate, 21) },
+                                { name: "Brucellosis (Heifers, if not vaccinated)", date: addDays(arrivalDate, 45) },
+                                { name: "Annual Boosters (FMD, HS-BQ, Anthrax)", date: "As per schedule" }
+                            ],
+                            housing: `
+                                <ul class="list-disc list-inside space-y-2 text-gray-700">
+                                    <li><strong>Bull Housing:</strong> Bulls must be housed individually in strong pens (12-15 sq. meters).</li>
+                                    <li><strong>Heifer Housing:</strong> Group housing is acceptable (3.5-4.0 sq. meters per animal).</li>
+                                    <li><strong>Floor:</strong> Non-slip floor is essential to prevent injuries during mounting.</li>
+                                    <li><strong>Paddock:</strong> Access to an open paddock for exercise (at least 1 hour/day) is highly recommended for fertility.</li>
+                                </ul>
+                            `
+                        };
+                    }
                 },
                 // --- BUFFALO DATA ---
                 Buffalo: {
-                    Fattening: (weight, adg) => dataGenerators.Cattle.Fattening(weight, adg || 600), // Use Cattle logic, slightly lower ADG
-                    "Milk Production": (weight, milkYield) => ({
-                        feed: `
-                            <h3 class="text-xl font-semibold text-gray-800 mb-4">Daily Feed Plan (Lactating Buffalo)</h3>
-                            <p class="mb-4 text-gray-600">Based on ${weight}kg weight and ${milkYield || 6} Liters/day yield. Buffalo milk is denser.</p>
-                            <ul class="space-y-3">
-                                <li class="p-4 bg-gray-50 rounded-lg border">
-                                    <strong class="text-gray-800">1. Maintenance Ration (for ${weight}kg body weight):</strong>
-                                    <ul class="list-disc list-inside ml-4 text-gray-700">
-                                        <li><strong>Green Grass (Napier/Para):</strong> 20 - 25 kg</li>
-                                        <li><strong>Dry Roughage (Paddy Straw):</strong> 5 - 6 kg (Buffalo are excellent roughage converters)</li>
-                                    </ul>
-                                </li>
-                                <li class="p-4 bg-green-50 rounded-lg border border-green-200">
-                                    <strong class="text-green-800">2. Production Ration (for ${milkYield || 6} L milk):</strong>
-                                    <p class="text-gray-700">Provide <strong>1 kg</strong> of concentrate mix for every <strong>2.0 Liters</strong> of milk.</p>
-                                    <p class="text-lg font-bold text-green-700 mt-2">Total Daily Concentrate: ${((milkYield || 6) / 2.0).toFixed(2)} kg</p>
-                                    <p class="text-sm text-gray-600 mt-2"><strong>Recommended Concentrate Mix:</strong> 25% Wheat Bran, 20% Rice Bran, 30% Mustard Oil Cake, 20% Gram/Pulse Husk, 3% DCP, 2% Salt.</p>
-                                </li>
-                            </ul>
-                        `,
-                        vax: (arrivalDate) => [
-                            { name: "Deworming (Broad Spectrum)", date: addDays(arrivalDate, 2) },
-                            { name: "FMD Vaccine", date: addDays(arrivalDate, 7) },
-                            { name: "HS-BQ Vaccine", date: addDays(arrivalDate, 21) },
-                            { name: "Anthrax Vaccine", date: addDays(arrivalDate, 30) },
-                            { name: "Annual Booster (FMD, HS-BQ)", date: "Every 6 months" },
-                            { name: "Mastitis Check", date: "Check daily before milking" }
-                        ],
-                        housing: `
-                            <ul class="list-disc list-inside space-y-2 text-gray-700">
-                                <li><strong>Space:</strong> 4.0 - 4.5 sq. meters per animal. Buffalo are larger.</li>
-                                <li><strong>Wallowing:</strong> CRITICAL for buffalo. Provide a wallowing tank or daily showering (2-3 times) to manage heat stress.</li>
-                                <li><strong>Shade:</strong> Must have adequate shade. Buffalo are more susceptible to heat stroke.</li>
-                                <li><strong>Floor:</strong> Concrete, non-slip, easy to clean.</li>
-                            </ul>
-                        `
-                    }),
-                    Breeding: (weight) => dataGenerators.Cattle.Breeding(weight) // Same logic
+                    Fattening: (weight, adg) => dataGenerators.Cattle.Fattening(weight, adg || 600),
+                    "Milk Production": (weight, milkYield) => {
+                        // Buffalo eat slightly more roughage
+                        const grass = (weight * 0.12).toFixed(1);
+                        const straw = (weight * 0.02).toFixed(1);
+
+                        return {
+                            feed: `
+                                <h3 class="text-xl font-semibold text-gray-800 mb-4">Daily Feed Plan (Lactating Buffalo)</h3>
+                                <p class="mb-4 text-gray-600">Based on <strong>${weight}kg</strong> weight and <strong>${milkYield || 6} Liters/day</strong> yield.</p>
+                                <ul class="space-y-3">
+                                    <li class="p-4 bg-gray-50 rounded-lg border">
+                                        <strong class="text-gray-800">1. Maintenance Ration (for ${weight}kg body weight):</strong>
+                                        <ul class="list-disc list-inside ml-4 text-gray-700">
+                                            <li><strong>Green Grass (Napier/Para):</strong> ${grass} kg</li>
+                                            <li><strong>Dry Roughage (Paddy Straw):</strong> ${straw} kg (Buffalo are excellent roughage converters)</li>
+                                        </ul>
+                                    </li>
+                                    <li class="p-4 bg-green-50 rounded-lg border border-green-200">
+                                        <strong class="text-green-800">2. Production Ration (for ${milkYield || 6} L milk):</strong>
+                                        <p class="text-gray-700">Provide <strong>1 kg</strong> of concentrate mix for every <strong>2.0 Liters</strong> of milk.</p>
+                                        <p class="text-lg font-bold text-green-700 mt-2">Total Daily Concentrate: ${((milkYield || 6) / 2.0).toFixed(2)} kg</p>
+                                        <p class="text-sm text-gray-600 mt-2"><strong>Recommended Concentrate Mix:</strong> 25% Wheat Bran, 20% Rice Bran, 30% Mustard Oil Cake, 20% Gram/Pulse Husk, 3% DCP, 2% Salt.</p>
+                                    </li>
+                                </ul>
+                            `,
+                            vax: (arrivalDate) => [
+                                { name: "Deworming (Broad Spectrum)", date: addDays(arrivalDate, 2) },
+                                { name: "FMD Vaccine", date: addDays(arrivalDate, 7) },
+                                { name: "HS-BQ Vaccine", date: addDays(arrivalDate, 21) },
+                                { name: "Anthrax Vaccine", date: addDays(arrivalDate, 30) },
+                                { name: "Annual Booster (FMD, HS-BQ)", date: "Every 6 months" },
+                                { name: "Mastitis Check", date: "Check daily before milking" }
+                            ],
+                            housing: `
+                                <ul class="list-disc list-inside space-y-2 text-gray-700">
+                                    <li><strong>Space:</strong> 4.0 - 4.5 sq. meters per animal. Buffalo are larger.</li>
+                                    <li><strong>Wallowing:</strong> CRITICAL for buffalo. Provide a wallowing tank or daily showering (2-3 times) to manage heat stress.</li>
+                                    <li><strong>Shade:</strong> Must have adequate shade. Buffalo are more susceptible to heat stroke.</li>
+                                    <li><strong>Floor:</strong> Concrete, non-slip, easy to clean.</li>
+                                </ul>
+                            `
+                        };
+                    },
+                    Breeding: (weight) => dataGenerators.Cattle.Breeding(weight)
                 },
                 // --- GOAT DATA ---
                 Goat: {
-                    Fattening: (weight, adg) => ({
-                        feed: `
-                            <h3 class="text-xl font-semibold text-gray-800 mb-4">90-Day Fattening Feed Plan (Goat)</h3>
-                            <p class="mb-4 text-gray-600">Based on ${weight}kg initial weight. Goats are browsers, so tree fodder is excellent. Target ADG: ${adg || 100}gm/day.</p>
-                            <div class="overflow-x-auto rounded-lg border border-gray-200">
-                                <table class="w-full divide-y divide-gray-200 output-table">
-                                    <thead class="bg-gray-100">
-                                        <tr>
-                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Period</th>
-                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Daily Ration per Animal</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="bg-white divide-y divide-gray-200">
-                                        <tr>
-                                            <td class="px-4 py-3 font-medium">Days 1-30</td>
-                                            <td class="px-4 py-3 text-gray-700"><strong>Tree Fodder (Jackfruit/Ipil-ipil leaves):</strong> 1.5 - 2.0 kg<br><strong>Green Grass (Napier):</strong> 1.0 kg<br><strong>Concentrate Mix:</strong> 150 - 200 gm</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-4 py-3 font-medium">Days 31-60</td>
-                                            <td class="px-4 py-3 text-gray-700"><strong>Tree Fodder:</strong> 2.0 - 2.5 kg<br><strong>Green Grass:</strong> 1.0 kg<br><strong>Concentrate Mix:</strong> 200 - 250 gm</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-4 py-3 font-medium">Days 61-90</td>
-                                            <td class="px-4 py-3 text-gray-700"><strong>Tree Fodder:</strong> 1.5 kg<br><strong>Green Grass:</strong> 0.5 kg<br><strong>Concentrate Mix:</strong> 300 - 350 gm (add 10% maize grain)</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <p class="mt-4 text-sm text-gray-600"><strong>Concentrate Mix:</strong> 35% Wheat Bran, 20% Rice Polish, 20% MOC, 20% Gram Husk, 3% DCP, 2% Salt.</p>
-                        `,
-                        vax: (arrivalDate) => [
-                            { name: "Deworming (Broad Spectrum)", date: addDays(arrivalDate, 2) },
-                            { name: "PPR Vaccine", date: addDays(arrivalDate, 7) },
-                            { name: "Anthrax Vaccine", date: addDays(arrivalDate, 14) },
-                            { name: "Goat Pox Vaccine", date: addDays(arrivalDate, 21) },
-                            { name: "FMD Vaccine", date: addDays(arrivalDate, 35) },
-                            { name: "Repeat Deworming", date: addDays(arrivalDate, 90) }
-                        ],
-                        housing: `
-                            <h3 class="text-xl font-semibold text-gray-800 mb-4">"Machan" (Raised Platform) Housing</h3>
-                            <ul class="list-disc list-inside space-y-2 text-gray-700">
-                                <li><strong>Floor:</strong> Raised platform (4-5 ft above ground) made of wooden or bamboo slats. This is ESSENTIAL in Bangladesh to prevent worms and foot rot.</li>
-                                <li><strong>Space:</strong> 1.5 - 2.0 sq. meters per adult goat.</li>
-                                <li><strong>Ventilation:</strong> Walls should be slatted or wire mesh for excellent airflow.</li>
-                                <li><strong>Roof:</strong> Tin or thatch roof with an overhang to prevent rain from entering.</li>
-                                <li><strong>Cleaning:</strong> Droppings fall through the slats, making it easy to clean underneath.</li>
-                            </ul>
-                        `
-                    }),
-                    "Milk Production": (weight, milkYield) => ({
-                        feed: `
-                            <h3 class="text-xl font-semibold text-gray-800 mb-4">Daily Feed Plan (Lactating Goat)</h3>
-                            <p class="mb-4 text-gray-600">Based on ${weight}kg weight and ${milkYield || 1.5} L/day yield.</p>
-                            <ul class="list-disc list-inside ml-4 text-gray-700 space-y-2">
-                                <li><strong>High-Quality Green Fodder:</strong> 3-4 kg (Mix of leguminous fodder like Ipil-ipil and grasses).</li>
-                                <li><strong>Concentrate Mix:</strong> 250-300 gm per day for maintenance, PLUS 200-250 gm extra for every 1 Liter of milk.</li>
-                                <li><strong>Total Concentrate:</strong> ${(0.3 + (milkYield || 1.5) * 0.25).toFixed(2)} kg/day.</li>
-                                <li><strong>Water:</strong> Clean, fresh water must be available at all times.</li>
-                            </ul>
-                        `,
-                        vax: (arrivalDate) => [
-                            { name: "Deworming", date: addDays(arrivalDate, 2) },
-                            { name: "PPR Vaccine", date: addDays(arrivalDate, 7) },
-                            { name: "Anthrax Vaccine", date: addDays(arrivalDate, 14) },
-                            { name: "FMD Vaccine", date: addDays(arrivalDate, 21) },
-                            { name: "HS-BQ (if in endemic area)", date: addDays(arrivalDate, 30) },
-                            { name: "Regular Deworming", date: "Every 3-4 months" }
-                        ],
-                        housing: `
-                            <h3 class="text-xl font-semibold text-gray-800 mb-4">"Machan" (Raised Platform) Housing</h3>
-                            <ul class="list-disc list-inside space-y-2 text-gray-700">
-                                <li><strong>Floor:</strong> Raised platform (4-5 ft above ground) is highly recommended.</li>
-                                <li><strong>Space:</strong> 1.5 - 2.0 sq. meters per adult doe. Provide separate, clean kidding pens.</li>
-                                <li><strong>Hygiene:</strong> Keep the house dry and clean. Disinfect kidding pens before use.</li>
-                                <li><strong>Mangers:</strong> Hang feed mangers outside the pen to prevent contamination.</li>
-                            </ul>
-                        `
-                    }),
-                    Breeding: (weight) => ({
-                        feed: `
-                            <h3 class="text-xl font-semibold text-gray-800 mb-4">Feed Plan (Breeding Goat)</h3>
-                            <p class="mb-4 text-gray-600">Focus on health and fertility. Based on ${weight}kg weight.</p>
-                            <ul class="list-disc list-inside ml-4 text-gray-700 space-y-2">
-                                <li><strong>High-Quality Fodder:</strong> Ad libitum (3-5 kg/day). Mix of grasses and tree leaves.</li>
-                                <li><strong>Concentrate Mix (Bucks):</strong> 300-400 gm/day to maintain good libido.</li>
-                                <li><strong>Flushing (Does):</strong> Increase concentrate to 300 gm/day for 2-3 weeks before breeding.</li>
-                                <li><strong>Minerals:</strong> Provide mineral block, especially with Zinc and Phosphorus.</li>
-                            </ul>
-                        `,
-                        vax: (arrivalDate) => [
-                            { name: "Deworming", date: addDays(arrivalDate, 2) },
-                            { name: "PPR Vaccine", date: addDays(arrivalDate, 7) },
-                            { name: "Anthrax Vaccine", date: addDays(arrivalDate, 14) },
-                            { name: "FMD Vaccine", date: addDays(arrivalDate, 21) },
-                            { name: "Goat Pox Vaccine", date: addDays(arrivalDate, 30) },
-                            { name: "Annual Boosters (PPR, FMD, Anthrax)", date: "Every year" }
-                        ],
-                        housing: `
-                            <h3 class="text-xl font-semibold text-gray-800 mb-4">Breeding Housing</h3>
-                            <ul class="list-disc list-inside space-y-2 text-gray-700">
-                                <li><strong>Buck Housing:</strong> House breeding bucks in a separate, strong pen (2.5 sq. meters) to prevent fighting and uncontrolled mating.</li>
-                                <li><strong>Doe Housing:</strong> Group housing in a 'Machan' shed is ideal.</li>
-                                <li><strong>Ventilation:</strong> Must have excellent airflow.</li>
-                            </ul>
-                        `
-                    })
+                    Fattening: (weight, adg) => {
+                        // Goat calculation
+                        // 1% - 1.5% BW Conc
+                        const concStart = (weight * 0.01).toFixed(2); // kg
+                        const concGrow = (weight * 0.015).toFixed(2);
+                        const concFinish = (weight * 0.02).toFixed(2);
+                        
+                        // Fodder 5% BW
+                        const fodder = (weight * 0.05).toFixed(1);
+
+                        return {
+                            feed: `
+                                <h3 class="text-xl font-semibold text-gray-800 mb-4">90-Day Fattening Feed Plan (Goat)</h3>
+                                <p class="mb-4 text-gray-600">Based on <strong>${weight}kg</strong> initial weight. Goats are browsers, so tree fodder is excellent. Target ADG: ${adg || 100}gm/day.</p>
+                                <div class="overflow-x-auto rounded-lg border border-gray-200">
+                                    <table class="w-full divide-y divide-gray-200 output-table">
+                                        <thead class="bg-gray-100">
+                                            <tr>
+                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Period</th>
+                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Daily Ration per Animal</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white divide-y divide-gray-200">
+                                            <tr>
+                                                <td class="px-4 py-3 font-medium">Days 1-30</td>
+                                                <td class="px-4 py-3 text-gray-700"><strong>Tree Fodder/Grass:</strong> ${fodder} kg<br><strong>Concentrate Mix:</strong> ${concStart} kg (${(concStart * 1000).toFixed(0)} gm)</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-4 py-3 font-medium">Days 31-60</td>
+                                                <td class="px-4 py-3 text-gray-700"><strong>Tree Fodder/Grass:</strong> ${fodder} kg<br><strong>Concentrate Mix:</strong> ${concGrow} kg (${(concGrow * 1000).toFixed(0)} gm)</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-4 py-3 font-medium">Days 61-90</td>
+                                                <td class="px-4 py-3 text-gray-700"><strong>Tree Fodder/Grass:</strong> ${fodder} kg<br><strong>Concentrate Mix:</strong> ${concFinish} kg (${(concFinish * 1000).toFixed(0)} gm) (add 10% maize grain)</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <p class="mt-4 text-sm text-gray-600"><strong>Concentrate Mix:</strong> 35% Wheat Bran, 20% Rice Polish, 20% MOC, 20% Gram Husk, 3% DCP, 2% Salt.</p>
+                            `,
+                            vax: (arrivalDate) => [
+                                { name: "Deworming (Broad Spectrum)", date: addDays(arrivalDate, 2) },
+                                { name: "PPR Vaccine", date: addDays(arrivalDate, 7) },
+                                { name: "Anthrax Vaccine", date: addDays(arrivalDate, 14) },
+                                { name: "Goat Pox Vaccine", date: addDays(arrivalDate, 21) },
+                                { name: "FMD Vaccine", date: addDays(arrivalDate, 35) },
+                                { name: "Repeat Deworming", date: addDays(arrivalDate, 90) }
+                            ],
+                            housing: `
+                                <h3 class="text-xl font-semibold text-gray-800 mb-4">"Machan" (Raised Platform) Housing</h3>
+                                <ul class="list-disc list-inside space-y-2 text-gray-700">
+                                    <li><strong>Floor:</strong> Raised platform (4-5 ft above ground) made of wooden or bamboo slats. This is ESSENTIAL in Bangladesh to prevent worms and foot rot.</li>
+                                    <li><strong>Space:</strong> 1.5 - 2.0 sq. meters per adult goat.</li>
+                                    <li><strong>Ventilation:</strong> Walls should be slatted or wire mesh for excellent airflow.</li>
+                                    <li><strong>Roof:</strong> Tin or thatch roof with an overhang to prevent rain from entering.</li>
+                                    <li><strong>Cleaning:</strong> Droppings fall through the slats, making it easy to clean underneath.</li>
+                                </ul>
+                            `
+                        };
+                    },
+                    "Milk Production": (weight, milkYield) => {
+                        // Maintenance: 1% BW Conc
+                        const maintConc = (weight * 0.01).toFixed(2);
+                        const prodConc = ((milkYield || 1.5) * 0.25).toFixed(2);
+                        const totalConc = (parseFloat(maintConc) + parseFloat(prodConc)).toFixed(2);
+                        const fodder = (weight * 0.05).toFixed(1);
+
+                        return {
+                            feed: `
+                                <h3 class="text-xl font-semibold text-gray-800 mb-4">Daily Feed Plan (Lactating Goat)</h3>
+                                <p class="mb-4 text-gray-600">Based on <strong>${weight}kg</strong> weight and <strong>${milkYield || 1.5} L/day</strong> yield.</p>
+                                <ul class="list-disc list-inside ml-4 text-gray-700 space-y-2">
+                                    <li><strong>High-Quality Green Fodder:</strong> ${fodder} kg (Mix of leguminous fodder like Ipil-ipil and grasses).</li>
+                                    <li><strong>Concentrate Mix:</strong> ${maintConc} kg for maintenance.</li>
+                                    <li><strong>Production Allowance:</strong> ${prodConc} kg extra (250g per liter).</li>
+                                    <li class="font-bold text-green-700">Total Concentrate: ${totalConc} kg/day (${(totalConc * 1000).toFixed(0)} gm).</li>
+                                    <li><strong>Water:</strong> Clean, fresh water must be available at all times.</li>
+                                </ul>
+                            `,
+                            vax: (arrivalDate) => [
+                                { name: "Deworming", date: addDays(arrivalDate, 2) },
+                                { name: "PPR Vaccine", date: addDays(arrivalDate, 7) },
+                                { name: "Anthrax Vaccine", date: addDays(arrivalDate, 14) },
+                                { name: "FMD Vaccine", date: addDays(arrivalDate, 21) },
+                                { name: "HS-BQ (if in endemic area)", date: addDays(arrivalDate, 30) },
+                                { name: "Regular Deworming", date: "Every 3-4 months" }
+                            ],
+                            housing: `
+                                <h3 class="text-xl font-semibold text-gray-800 mb-4">"Machan" (Raised Platform) Housing</h3>
+                                <ul class="list-disc list-inside space-y-2 text-gray-700">
+                                    <li><strong>Floor:</strong> Raised platform (4-5 ft above ground) is highly recommended.</li>
+                                    <li><strong>Space:</strong> 1.5 - 2.0 sq. meters per adult doe. Provide separate, clean kidding pens.</li>
+                                    <li><strong>Hygiene:</strong> Keep the house dry and clean. Disinfect kidding pens before use.</li>
+                                    <li><strong>Mangers:</strong> Hang feed mangers outside the pen to prevent contamination.</li>
+                                </ul>
+                            `
+                        };
+                    },
+                    Breeding: (weight) => {
+                         const fodder = (weight * 0.05).toFixed(1);
+                         const conc = (weight * 0.015).toFixed(2);
+
+                        return {
+                            feed: `
+                                <h3 class="text-xl font-semibold text-gray-800 mb-4">Feed Plan (Breeding Goat)</h3>
+                                <p class="mb-4 text-gray-600">Focus on health and fertility. Based on <strong>${weight}kg</strong> weight.</p>
+                                <ul class="list-disc list-inside ml-4 text-gray-700 space-y-2">
+                                    <li><strong>High-Quality Fodder:</strong> Ad libitum (${fodder} kg/day). Mix of grasses and tree leaves.</li>
+                                    <li><strong>Concentrate Mix (Bucks):</strong> ${conc} kg/day (${(conc * 1000).toFixed(0)} gm) to maintain good libido.</li>
+                                    <li><strong>Flushing (Does):</strong> Increase concentrate to ${(parseFloat(conc) + 0.1).toFixed(2)} kg/day for 2-3 weeks before breeding.</li>
+                                    <li><strong>Minerals:</strong> Provide mineral block, especially with Zinc and Phosphorus.</li>
+                                </ul>
+                            `,
+                            vax: (arrivalDate) => [
+                                { name: "Deworming", date: addDays(arrivalDate, 2) },
+                                { name: "PPR Vaccine", date: addDays(arrivalDate, 7) },
+                                { name: "Anthrax Vaccine", date: addDays(arrivalDate, 14) },
+                                { name: "FMD Vaccine", date: addDays(arrivalDate, 21) },
+                                { name: "Goat Pox Vaccine", date: addDays(arrivalDate, 30) },
+                                { name: "Annual Boosters (PPR, FMD, Anthrax)", date: "Every year" }
+                            ],
+                            housing: `
+                                <h3 class="text-xl font-semibold text-gray-800 mb-4">Breeding Housing</h3>
+                                <ul class="list-disc list-inside space-y-2 text-gray-700">
+                                    <li><strong>Buck Housing:</strong> House breeding bucks in a separate, strong pen (2.5 sq. meters) to prevent fighting and uncontrolled mating.</li>
+                                    <li><strong>Doe Housing:</strong> Group housing in a 'Machan' shed is ideal.</li>
+                                    <li><strong>Ventilation:</strong> Must have excellent airflow.</li>
+                                </ul>
+                            `
+                        };
+                    }
                 },
                 // --- SHEEP DATA ---
                 Sheep: {
-                    // Sheep logic can be very similar to Goat, with minor tweaks.
-                    Fattening: (weight, adg) => dataGenerators.Goat.Fattening(weight, adg || 120), // Use Goat logic
-                    "Milk Production": (weight, milkYield) => dataGenerators.Goat["Milk Production"](weight, milkYield || 0.5), // Use Goat logic, ensuring key matches
-                    Breeding: (weight) => dataGenerators.Goat.Breeding(weight) // Use Goat logic
+                    Fattening: (weight, adg) => dataGenerators.Goat.Fattening(weight, adg || 120),
+                    "Milk Production": (weight, milkYield) => dataGenerators.Goat["Milk Production"](weight, milkYield || 0.5),
+                    Breeding: (weight) => dataGenerators.Goat.Breeding(weight)
                 }
             };
             
@@ -600,7 +644,7 @@
                 }
                 
                 const arrivalDate = new Date(dateStr);
-                if (isNaN(arrivalDate.getTime())) { // More robust check for Invalid Date
+                if (isNaN(arrivalDate.getTime())) { 
                     showError("The Arrival Date is invalid. Please select a valid date.");
                     return;
                 }
